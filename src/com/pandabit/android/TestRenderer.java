@@ -1,3 +1,6 @@
+//	http://blog.jayway.com/2010/01/01/opengl-es-tutorial-for-android-%E2%80%93-part-iii-%E2%80%93-transformations/
+//	http://www.droidnova.com/android-3d-game-tutorial-part-iii,348.html
+
 package com.pandabit.android;
 
 import java.nio.ByteBuffer;
