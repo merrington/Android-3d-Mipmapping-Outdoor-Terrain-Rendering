@@ -21,6 +21,8 @@ public class TestRenderer implements GLSurfaceView.Renderer {
     private float _green = 0.2f;
     private float _blue = 0.2f;
     
+    private float _width, _height;
+    
     private float angle = 0.0f;
     
     //Triangle stuff
@@ -39,20 +41,36 @@ public class TestRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
     	Log.v(LOG_TAG, "Starting app!");
     	
+    	gl.glMatrixMode(GL10.GL_PROJECTION);
+    	float ratio = _width / _height;
+    	gl.glOrthof(-1, 1, -1/ratio, 1/ratio, 0.01f, 100.0f);
+    	gl.glViewport(0, 0, (int)_width, (int)_height);
+    	
+    	gl.glMatrixMode(GL10.GL_MODELVIEW);
+    	gl.glEnable(GL10.GL_DEPTH_TEST);
+    	gl.glClearColor(_red, _green, _blue, 1.0f);
+    	
     	gl.glShadeModel(GL10.GL_SMOOTH);
     	gl.glClearDepthf(1.0f);
-    	gl.glEnable(GL10.GL_DEPTH_TEST);
+    	
     	gl.glDepthFunc(GL10.GL_LEQUAL);
     	gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
+        gl.glFrontFace(GL10.GL_CCW);
     	
-        gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+    	// define the color we want to be displayed as the "clipping wall"
+        
+    	
+    	
         drawSquare();
     }
  
     @Override
     public void onSurfaceChanged(GL10 gl, int w, int h) {
         gl.glViewport(0, 0, w, h);
-        gl.glMatrixMode(GL10.GL_PROJECTION);
+        
+        _width = w;
+        _height = h;
+        
         gl.glLoadIdentity();
         GLU.gluPerspective(gl, 45.0f, (float)w/(float)h, 0.1f, 100.0f);
         gl.glMatrixMode(GL10.GL_MODELVIEW);
@@ -63,7 +81,7 @@ public class TestRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl) {
     	gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
     	gl.glLoadIdentity();
-    	gl.glTranslatef(0, 0, -10);
+    	gl.glTranslatef(0, 0, -20);
     	
     	gl.glPushMatrix();
     	gl.glRotatef(angle, 0, 0, 1);
@@ -91,20 +109,15 @@ public class TestRenderer implements GLSurfaceView.Renderer {
     }
     
     private void drawSq(GL10 gl)
-    {
-    	gl.glFrontFace(GL10.GL_CCW);
+    {    	
+    	gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
     	gl.glEnable(GL10.GL_CULL_FACE);
     	gl.glCullFace(GL10.GL_BACK);
-    	
-    	// define the color we want to be displayed as the "clipping wall"
-        gl.glClearColor(_red, _green, _blue, 1.0f);
-    	gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-    	
     	//gl.glColor4f(0.5f, 0f, 0f, 0.5f);
     	gl.glVertexPointer(3, GL10.GL_FLOAT, 0, _vertexBuffer);
     	Log.v(LOG_TAG, "Drawing a square");
     	gl.glDrawElements(GL10.GL_TRIANGLES, indicesArray.length, GL10.GL_UNSIGNED_SHORT, _indexBuffer);
-    
+    	
     	gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
     	gl.glDisable(GL10.GL_CULL_FACE);
     }
