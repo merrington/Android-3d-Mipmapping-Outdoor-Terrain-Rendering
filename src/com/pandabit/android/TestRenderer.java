@@ -162,25 +162,29 @@ public class TestRenderer implements GLSurfaceView.Renderer, OnTouchListener {
     		{
     			//load the entire patch into vertArray
     			float[] vertArray = new float[289];
-            	for (int a=patchy*17; a<(patchy*17)+17; a++)
+            	for (int a=patchy*16; a<(patchy*16)+17; a++)
             	{
-            		for (int b=firstInRow; b<lastInRow; b++)
+            		for (int b=patchx*16; b<(patchx*16)+17; b++)
             		{
             			//one row at a time
-            			vertArray[(a*17)+b] = heightmapArray[a][b];
+            			vertArray[a+b] = heightmapArray[b][a];
             		}
             	}
-    			
-    			int firstInRow, lastInRow;
-    			firstInRow = (patchy*17)+patchx;
-    			lastInRow = firstInRow+17;
+            	
+            	//find LoD at each corner
+            	//get distances
+            	double distTopLeft = Math.sqrt(Math.pow(((patchx*16)-cx),2)+Math.pow(((patchy*16)-cy),2));
+            	double distTopRight = Math.sqrt(Math.pow(((patchx*16)+17-cx),2)+Math.pow(((patchy*16)-cy),2));
+            	double distBotLeft = Math.sqrt(Math.pow(((patchx*16)-cx),2)+Math.pow(((patchy*16)+17-cy),2));
+            	double distBotRight = Math.sqrt(Math.pow(((patchx*16)+17-cx),2)+Math.pow(((patchy*16)+17-cy),2));
+            	//calculate LoD
+            	
+            	
+            	
     			//draw edges first, then draw body
     			
     			//need to find distance from camera of 4 corners of patch(cx, cy, cz) to determine LoD
     			//because of overlap patch, can know if LoD changes
-    			float lodTopLeft = (patchx*17)
-    			
-    			
     			
     		}    		
     	}
