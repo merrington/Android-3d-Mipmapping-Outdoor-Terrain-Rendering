@@ -156,29 +156,55 @@ public class TestRenderer implements GLSurfaceView.Renderer, OnTouchListener {
     		shape = GL10.GL_LINES;
     	
     	//map is 257x257, overlap squares by 1 = 17x17 patches
-    	for (int patchy=0; patchy<17; patchy++)
+    	for (int patchy=0; patchy<16; patchy++)
     	{
-    		for (int patchx=0; patchx<17; patchx++)
+    		for (int patchx=0; patchx<16; patchx++)
     		{
     			//load the entire patch into vertArray
-    			float[] vertArray = new float[289];
+    			float[] vertArray = new float[17*17];
             	for (int a=patchy*16; a<(patchy*16)+17; a++)
             	{
             		for (int b=patchx*16; b<(patchx*16)+17; b++)
             		{
             			//one row at a time
-            			vertArray[a+b] = heightmapArray[b][a];
+            			float tempVar = heightmapArray[b][a];
+            			vertArray[(a%16)+(b%16)] = tempVar;
             		}
             	}
             	
             	//find LoD at each corner
             	//get distances
-            	double distTopLeft = Math.sqrt(Math.pow(((patchx*16)-cx),2)+Math.pow(((patchy*16)-cy),2));
-            	double distTopRight = Math.sqrt(Math.pow(((patchx*16)+17-cx),2)+Math.pow(((patchy*16)-cy),2));
-            	double distBotLeft = Math.sqrt(Math.pow(((patchx*16)-cx),2)+Math.pow(((patchy*16)+17-cy),2));
-            	double distBotRight = Math.sqrt(Math.pow(((patchx*16)+17-cx),2)+Math.pow(((patchy*16)+17-cy),2));
-            	//calculate LoD
             	
+            	//Log.v(LOG_TAG, "DISTANCES");
+            	//Log.v(LOG_TAG, "patchx: "+patchx+", patchy: "+patchy);
+            	int patchWidth = step_size*16;
+            	double distTopLeft = Math.sqrt(Math.pow((patchx*patchWidth)-cx,2)+Math.pow((patchy*patchWidth)-cz,2));
+            	//Log.v(LOG_TAG, "distTopLeft: "+distTopLeft);
+            	double distTopRight = Math.sqrt(Math.pow(((patchx+1)*patchWidth)-cx,2)+Math.pow((patchy*patchWidth)-cz,2));
+            	//Log.v(LOG_TAG, "distTopRight: "+distTopRight);
+            	double distBotLeft = Math.sqrt(Math.pow((patchx*patchWidth)-cx,2)+Math.pow(((patchy+1)*patchWidth)-cz,2));
+            	//Log.v(LOG_TAG, "distBotLeft: "+distBotLeft);
+            	double distBotRight = Math.sqrt(Math.pow(((patchx+1)*patchWidth)-cx,2)+Math.pow(((patchy+1)*patchWidth)-cz,2));
+            	//Log.v(LOG_TAG, "distBotRight: "+distBotRight);
+            	
+            	//calculate LoD
+            	//0-500, 501-1000, 1001-2500, 2500+
+            	if (distBotLeft <= 500)
+            	{
+            		Log.v(LOG_TAG, "patchx: "+patchx+", patchy: "+patchy+" is level 0");
+            	}
+            	if ((distBotLeft > 501) && (distBotLeft <=1000))
+            	{
+            		Log.v(LOG_TAG, "patchx: "+patchx+", patchy: "+patchy+" is level 1");
+            	}
+            	if ((distBotLeft > 1001) && (distBotLeft < 2500))
+            	{
+            		Log.v(LOG_TAG, "patchx: "+patchx+", patchy: "+patchy+" is level 2");
+            	}
+            	if (distBotLeft > 2500)
+            	{
+            		Log.v(LOG_TAG, "patchx: "+patchx+", patchy: "+patchy+" is level 3");
+            	}
             	
             	
     			//draw edges first, then draw body
@@ -309,6 +335,8 @@ public class TestRenderer implements GLSurfaceView.Renderer, OnTouchListener {
 	private void setupBuffers() {
 		//map is 257x257 - use 17x17 squares
 		
+		Log.v(LOG_TAG, "Starting setupBuffes()");
+		
 		indArrayld0Tops = new short[66];
 		//define first 2 triangles, these match the LOD of level 1
 		indArrayld0Tops[0] = 0;	indArrayld0Tops[1] = 34;	indArrayld0Tops[2] = 2;
@@ -396,6 +424,8 @@ public class TestRenderer implements GLSurfaceView.Renderer, OnTouchListener {
 		ByteBuffer ibb = ByteBuffer.allocate(indArrayld0Bodies.length * 2); //body array has most vertices, 2 bytes for a short
 		ibb.order(ByteOrder.nativeOrder());
 		indexBuffer = ibb.asShortBuffer();
+		
+		Log.v(LOG_TAG, "Finishing setupBuffes()");
 	}
 	
 	private void setupLighting() {
